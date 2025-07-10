@@ -1,0 +1,8 @@
+
+services:
+  go-server:
+    container_name: "k6_go_serve"
+    build: ./go-server
+    tty: true
+    ports:
+      - "1234:1234"
