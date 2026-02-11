@@ -2,111 +2,191 @@
   <img src="etc/k6.svg" alt="k6 Logo" width="200"/>
 </div>
 
-# 📈 Grafana k6
+# 📈 Grafana k6 - Testes de Carga
 
 **Grafana k6** é uma ferramenta de teste de carga de código aberto, desenvolvedor-friendly e altamente extensível. Com ela, é possível antecipar problemas de desempenho e garantir a confiabilidade do sistema sob diferentes condições de carga.
 
 ---
 
-## ✅ Tipos de Testes
+## 📋 Índice
 
-### 🔹 Smoke Test  
-Testa o funcionamento básico da aplicação com carga mínima e curta duração.
-
-- **Exemplo:** 1 usuário por 1 minuto  
-- **Quando usar:** Após atualizações no código ou nos scripts de teste, para validar o funcionamento geral e obter métricas básicas.
-
----
-
-### 🔹 Load Test  
-Simula usuários simultâneos e carga contínua, avaliando o desempenho em condições normais de uso.
-
-- **Exemplo:**  
-  - 100 usuários - 5 min  
-  - 100 usuários - 10 min  
-  - 0 usuários - 5 min  
-- **Quando usar:** Para verificar se o sistema suporta a carga de produção e identificar gargalos iniciais.
+1. [Tipos de Testes](#tipos-de-testes)
+2. [Guia Rápido](#guia-rápido)
+3. [Estrutura do Projeto](#estrutura-do-projeto)
+4. [Como Usar](#como-usar)
+5. [Exemplo de Execução](#exemplo-de-execução)
 
 ---
 
-### 🔹 Stress Test  
-Avalia o sistema sob carga extrema, além dos limites normais de uso.
+## Tipos de Testes
 
-- **Exemplo:**  
-  - 100 usuários - 5 min  
-  - 200 usuários - 20 min  
-  - 100 usuários - 5 min  
-- **Quando usar:** Para identificar o ponto de falha do sistema e avaliar sua capacidade de recuperação.
+### Smoke Test
 
----
+**O quê:** Teste básico com carga mínima  
+**Carga:** 1 usuário  
+**Duração:** 1 minuto
 
-### 🔹 Spike Test  
-Aplica uma carga muito alta em um curto intervalo de tempo.
+**Quando usar:**
+- Após atualizações no código ou scripts de teste
+- Para validação rápida antes de testes mais complexos
+- Para obter métricas básicas do sistema
 
-- **Exemplo:**  
-  - 100 usuários - 1 min  
-  - 2000 usuários - 30s  
-  - 100 usuários - 1 min  
-- **Quando usar:** Para verificar a resposta do sistema a picos repentinos de acesso.
+**Arquivo:** `k6/test-types/smoke_test.js`
 
 ---
 
-### 🔹 Soak Test  
-Testa o sistema por longos períodos para identificar degradações, vazamentos de memória e problemas de estabilidade.
+### Load Test
 
-- **Exemplo:**  
-  - 100 usuários - 5 min  
-  - 100 usuários - 8 horas  
-  - 0 usuários - 1 min  
-- **Quando usar:** Após mudanças importantes ou em sistemas que precisam estar sempre disponíveis.
+**O quê:** Teste com carga normal de produção  
+**Carga:** 100 usuários simultâneos  
+**Duração:** 20 minutos (5 min ramp-up + 10 min carga + 5 min ramp-down)
 
----
+**Quando usar:**
+- Verificar se o sistema suporta a carga esperada do dia a dia
+- Identificar gargalos iniciais
+- Medir desempenho em condições normais
 
-### 🔹 Breakpoint Test  
-Aponta os limites máximos do sistema, interrompendo o teste quando o sistema começar a falhar.
-
-- **Exemplo:**  
-  - 20.000 usuários - 2 horas  
-- **Quando usar:** Para entender os limites superiores do sistema, especialmente após grandes alterações na infraestrutura ou no código.
+**Arquivo:** `k6/test-types/load_test.js`
 
 ---
 
-## 🧭 Guia Rápido de Testes
+### Stress Test
 
-| Tipo        | Carga                    | Duração              | Uso Recomendado                                                                 |
-|-------------|--------------------------|----------------------|----------------------------------------------------------------------------------|
-| **Smoke**   | Baixa                    | Curta (segundos/min) | Validação rápida após mudanças no código/sistema.                              |
-| **Load**    | Média (produção)         | Média (5–60 min)     | Medir desempenho com carga esperada do dia a dia.                              |
-| **Stress**  | Alta                     | Média (5–60 min)     | Testar limites sob carga crescente.                                            |
-| **Spike**   | Muito alta (repentina)   | Curta (minutos)      | Validar resiliência a picos súbitos de usuários.                               |
-| **Soak**    | Média                    | Longa (horas)        | Avaliar estabilidade a longo prazo.                                            |
-| **Breakpoint** | Crescente até falhar | Indeterminada         | Encontrar o ponto de quebra do sistema.                                        |
+**O quê:** Teste com carga crescente até falha  
+**Carga:** 100 a 200 usuários progressivamente  
+**Duração:** 30 minutos
 
-🔗 [Documentação oficial dos testes](https://grafana.com/docs/k6/latest/testing-guides/test-types/)
+**Quando usar:**
+- Encontrar o ponto de falha do sistema
+- Avaliar capacidade de recuperação
+- Testar limites sob carga crescente
+
+**Arquivo:** `k6/test-types/stress_test.js`
 
 ---
 
-## 🚀 Como Usar
+### Spike Test
 
-### 1. Subir o ambiente com Docker Compose
+**O quê:** Teste com picos súbitos de carga muito alta  
+**Carga:** De 100 para 2000 usuários em 30 segundos  
+**Duração:** 2 minutos
 
-```sh
+**Quando usar:**
+- Verificar resposta do sistema a acessos repentinos
+- Avaliar resiliência e recuperação rápida
+- Validar comportamento em horários de pico
+
+**Arquivo:** `k6/test-types/spike_test.js`
+
+---
+
+### Soak Test
+
+**O quê:** Teste prolongado para verificar estabilidade  
+**Carga:** 100 usuários contínuos  
+**Duração:** 8 horas
+
+**Quando usar:**
+- Identificar vazamentos de memória
+- Avaliar degradação gradual do desempenho
+- Garantir estabilidade em sistemas sempre disponíveis
+
+**Arquivo:** `k6/test-types/soak_test.js`
+
+---
+
+### Breakpoint Test
+
+**O quê:** Teste progressivo até encontrar o ponto de quebra  
+**Carga:** Crescente até falha (até 20.000 usuários)  
+**Duração:** Variável (até 2 horas)
+
+**Quando usar:**
+- Encontrar os limites máximos absolutos do sistema
+- Após grandes alterações na infraestrutura
+- Para entender a capacidade total
+
+**Arquivo:** `k6/test-types/breakpoint_test.js`
+
+---
+
+## Guia Rápido
+
+| Tipo | Carga | Duração | Frequência | Objetivo |
+|------|-------|---------|-----------|----------|
+| **Smoke** | Mínima | < 1 min | Toda mudança | Validação rápida |
+| **Load** | Normal | 5-60 min | Diária | Monitorar desempenho |
+| **Stress** | Alta crescente | 5-60 min | Semanal | Encontrar limite |
+| **Spike** | Muito alta | Minutos | Semanal | Testar picos |
+| **Soak** | Normal | Horas | Semanal | Estabilidade |
+| **Breakpoint** | Máxima | Variável | Mensal | Capacidade total |
+
+🔗 [Documentação oficial - Tipos de Testes](https://grafana.com/docs/k6/latest/testing-guides/test-types/)
+
+---
+
+## Estrutura do Projeto
+
+```
+grafana-k6/
+├── README.md                    # Este arquivo
+├── docker-compose.yaml          # Configuração do ambiente Docker
+├── etc/                         # Arquivos auxiliares
+├── go-server/                   # Servidor Go para teste
+│   ├── Dockerfile
+│   ├── go.mod
+│   └── main.go
+├── k6/                          # Scripts de teste k6
+│   ├── example/                 # Exemplos de funcionalidades
+│   │   ├── check.js             # Testes com assertions
+│   │   ├── group.js             # Agrupamento de requisições
+│   │   ├── metrics.js           # Métricas customizadas
+│   │   ├── request.js           # Requisições HTTP
+│   │   ├── tags.js              # Etiquetas e categorização
+│   │   └── thresholds.js        # Limiares de sucesso
+│   ├── scenarios/               # Cenários de teste
+│   │   ├── constant-arrival-rate.js
+│   │   ├── constant-vus.js
+│   │   ├── per-vu-iterations.js
+│   │   └── shared-iterations.js
+│   └── test-types/              # Tipos de testes principais
+│       ├── smoke_test.js
+│       ├── load_test.js
+│       ├── stress_test.js
+│       ├── spike_test.js
+│       ├── soak_test.js
+│       └── breakpoint_test.js
+└── xk6/                         # Extensões k6
+    ├── Dockerfile               # Build com extensões
+    └── k6/
+```
+
+---
+
+## Como Usar
+
+### Passo 1: Subir o Ambiente
+
+```bash
 docker compose up -d
 ```
 
-### 2. Build da imagem com xk6
+Isso inicia:
+- Servidor Go de teste em `http://localhost:1234`
 
-Navegue até a pasta `xk6` e execute:
+### Passo 2: Compilar Imagem com Extensões
 
-```sh
+```bash
+cd xk6
 docker build -t k6-dashboard .
+cd ..
 ```
 
-### 3. Executar um teste
+### Passo 3: Executar um Teste
 
-Escolha o tipo de teste e rode com:
+Escolha um tipo de teste e execute:
 
-```sh
+```bash
 docker run -it -p 5665:5665 \
   -v $(pwd)/k6:/scripts \
   --network host \
@@ -114,4 +194,51 @@ docker run -it -p 5665:5665 \
   run --out dashboard=period=2s /scripts/test-types/smoke_test.js
 ```
 
-> 💡 Substitua o arquivo `test-types/smoke_test.js` pelo tipo de teste que deseja executar (e.g., `test-types/load_test.js`, `test-types/stress_test.js` etc.)
+### Passo 4: Visualizar Resultados
+
+Acesse o dashboard em `http://localhost:5665` para ver as métricas em tempo real.
+
+---
+
+## Exemplo de Execução
+
+### Executar Smoke Test
+
+```bash
+docker run -it -p 5665:5665 \
+  -v $(pwd)/k6:/scripts \
+  --network host \
+  k6-dashboard \
+  run --out dashboard=period=2s /scripts/test-types/smoke_test.js
+```
+
+### Executar Load Test
+
+```bash
+docker run -it -p 5665:5665 \
+  -v $(pwd)/k6:/scripts \
+  --network host \
+  k6-dashboard \
+  run --out dashboard=period=2s /scripts/test-types/load_test.js
+```
+
+### Executar Stress Test
+
+```bash
+docker run -it -p 5665:5665 \
+  -v $(pwd)/k6:/scripts \
+  --network host \
+  k6-dashboard \
+  run --out dashboard=period=2s /scripts/test-types/stress_test.js
+```
+
+**💡 Dica:** Substitua o arquivo final pelo teste desejado. Todos seguem o mesmo padrão.
+
+---
+
+## Próximas Etapas
+
+- Explore os exemplos em `k6/example/` para aprender funcionalidades
+- Customize os scripts de teste conforme suas necessidades
+- Integre com CI/CD para testes automatizados
+- Consulte a [documentação oficial k6](https://grafana.com/docs/k6/latest/) para recursos avançados
