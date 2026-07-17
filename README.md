@@ -234,11 +234,3 @@ docker exec -it k6_run k6 run /scripts/test-types/stress_test.js
 
 **💡 Dica:** Substitua o arquivo final pelo teste desejado. Todos seguem o mesmo padrão.
 
----
-
-## Próximas Etapas
-
-- Explore os exemplos em `k6/example/` para aprender funcionalidades
-- Customize os scripts de teste conforme suas necessidades
-- Integre com CI/CD para testes automatizados
-- Consulte a [documentação oficial k6](https://grafana.com/docs/k6/latest/) para recursos avançados
