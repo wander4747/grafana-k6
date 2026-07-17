@@ -6,6 +6,8 @@
 
 **Grafana k6** é uma ferramenta de teste de carga de código aberto, desenvolvedor-friendly e altamente extensível. Com ela, é possível antecipar problemas de desempenho e garantir a confiabilidade do sistema sob diferentes condições de carga.
 
+Este projeto usa o **[web dashboard nativo do k6](https://grafana.com/docs/k6/latest/results-output/web-dashboard/)** para gerar um dashboard web em tempo real com as métricas de cada teste.
+
 ---
 
 ## 📋 Índice
@@ -33,6 +35,10 @@
 
 **Arquivo:** `k6/test-types/smoke_test.js`
 
+```bash
+docker exec -it k6_run k6 run /scripts/test-types/smoke_test.js
+```
+
 ---
 
 ### Load Test
@@ -47,6 +53,10 @@
 - Medir desempenho em condições normais
 
 **Arquivo:** `k6/test-types/load_test.js`
+
+```bash
+docker exec -it k6_run k6 run /scripts/test-types/load_test.js
+```
 
 ---
 
@@ -63,6 +73,10 @@
 
 **Arquivo:** `k6/test-types/stress_test.js`
 
+```bash
+docker exec -it k6_run k6 run /scripts/test-types/stress_test.js
+```
+
 ---
 
 ### Spike Test
@@ -77,6 +91,10 @@
 - Validar comportamento em horários de pico
 
 **Arquivo:** `k6/test-types/spike_test.js`
+
+```bash
+docker exec -it k6_run k6 run /scripts/test-types/spike_test.js
+```
 
 ---
 
@@ -93,6 +111,10 @@
 
 **Arquivo:** `k6/test-types/soak_test.js`
 
+```bash
+docker exec -it k6_run k6 run /scripts/test-types/soak_test.js
+```
+
 ---
 
 ### Breakpoint Test
@@ -107,6 +129,10 @@
 - Para entender a capacidade total
 
 **Arquivo:** `k6/test-types/breakpoint_test.js`
+
+```bash
+docker exec -it k6_run k6 run /scripts/test-types/breakpoint_test.js
+```
 
 ---
 
@@ -130,35 +156,32 @@
 ```
 grafana-k6/
 ├── README.md                    # Este arquivo
-├── docker-compose.yaml          # Configuração do ambiente Docker
+├── docker-compose.yaml          # Sobe go-server e k6 (imagem oficial grafana/k6)
 ├── etc/                         # Arquivos auxiliares
 ├── go-server/                   # Servidor Go para teste
 │   ├── Dockerfile
 │   ├── go.mod
 │   └── main.go
-├── k6/                          # Scripts de teste k6
-│   ├── example/                 # Exemplos de funcionalidades
-│   │   ├── check.js             # Testes com assertions
-│   │   ├── group.js             # Agrupamento de requisições
-│   │   ├── metrics.js           # Métricas customizadas
-│   │   ├── request.js           # Requisições HTTP
-│   │   ├── tags.js              # Etiquetas e categorização
-│   │   └── thresholds.js        # Limiares de sucesso
-│   ├── scenarios/               # Cenários de teste
-│   │   ├── constant-arrival-rate.js
-│   │   ├── constant-vus.js
-│   │   ├── per-vu-iterations.js
-│   │   └── shared-iterations.js
-│   └── test-types/              # Tipos de testes principais
-│       ├── smoke_test.js
-│       ├── load_test.js
-│       ├── stress_test.js
-│       ├── spike_test.js
-│       ├── soak_test.js
-│       └── breakpoint_test.js
-└── xk6/                         # Extensões k6
-    ├── Dockerfile               # Build com extensões
-    └── k6/
+└── k6/                          # Scripts de teste k6
+    ├── example/                 # Exemplos de funcionalidades
+    │   ├── check.js             # Testes com assertions
+    │   ├── group.js             # Agrupamento de requisições
+    │   ├── metrics.js           # Métricas customizadas
+    │   ├── request.js           # Requisições HTTP
+    │   ├── tags.js              # Etiquetas e categorização
+    │   └── thresholds.js        # Limiares de sucesso
+    ├── scenarios/               # Cenários de teste
+    │   ├── constant-arrival-rate.js
+    │   ├── constant-vus.js
+    │   ├── per-vu-iterations.js
+    │   └── shared-iterations.js
+    └── test-types/              # Tipos de testes principais
+        ├── smoke_test.js
+        ├── load_test.js
+        ├── stress_test.js
+        ├── spike_test.js
+        ├── soak_test.js
+        └── breakpoint_test.js
 ```
 
 ---
@@ -173,28 +196,17 @@ docker compose up -d
 
 Isso inicia:
 - Servidor Go de teste em `http://localhost:1234`
+- Container `k6_run` (imagem oficial `grafana/k6`), ocioso e pronto pra rodar testes
 
-### Passo 2: Compilar Imagem com Extensões
+### Passo 2: Executar um Teste
 
-```bash
-cd xk6
-docker build -t k6-dashboard .
-cd ..
-```
-
-### Passo 3: Executar um Teste
-
-Escolha um tipo de teste e execute:
+Escolha um tipo de teste e execute dentro do container já em pé:
 
 ```bash
-docker run -it -p 5665:5665 \
-  -v $(pwd)/k6:/scripts \
-  --network host \
-  k6-dashboard \
-  run --out dashboard=period=2s /scripts/test-types/smoke_test.js
+docker exec -it k6_run k6 run /scripts/test-types/smoke_test.js
 ```
 
-### Passo 4: Visualizar Resultados
+### Passo 3: Visualizar Resultados
 
 Acesse o dashboard em `http://localhost:5665` para ver as métricas em tempo real.
 
@@ -205,31 +217,19 @@ Acesse o dashboard em `http://localhost:5665` para ver as métricas em tempo rea
 ### Executar Smoke Test
 
 ```bash
-docker run -it -p 5665:5665 \
-  -v $(pwd)/k6:/scripts \
-  --network host \
-  k6-dashboard \
-  run --out dashboard=period=2s /scripts/test-types/smoke_test.js
+docker exec -it k6_run k6 run /scripts/test-types/smoke_test.js
 ```
 
 ### Executar Load Test
 
 ```bash
-docker run -it -p 5665:5665 \
-  -v $(pwd)/k6:/scripts \
-  --network host \
-  k6-dashboard \
-  run --out dashboard=period=2s /scripts/test-types/load_test.js
+docker exec -it k6_run k6 run /scripts/test-types/load_test.js
 ```
 
 ### Executar Stress Test
 
 ```bash
-docker run -it -p 5665:5665 \
-  -v $(pwd)/k6:/scripts \
-  --network host \
-  k6-dashboard \
-  run --out dashboard=period=2s /scripts/test-types/stress_test.js
+docker exec -it k6_run k6 run /scripts/test-types/stress_test.js
 ```
 
 **💡 Dica:** Substitua o arquivo final pelo teste desejado. Todos seguem o mesmo padrão.
